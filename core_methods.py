@@ -189,7 +189,7 @@ def compute_detailed_error_categories(segments):
     return new_segments
 
 
-def compute_segment_statistics(segments):
+def count_segment_categories(segments):
     categories = ["TP", "TN", "I", "D", "F", "M", "Os", "Oe", "Us", "Ue"]
     results = {}
 
@@ -210,14 +210,36 @@ def compute_segment_statistics(segments):
     return results, results_normed
 
 
+def twoset_metrics(segment_counts):
+    P = segment_counts["D"] + segment_counts["F"] + segment_counts["Us"] + segment_counts["Ue"] + segment_counts["TP"]
+    N = segment_counts["I"] + segment_counts["M"] + segment_counts["Os"] + segment_counts["Oe"] + segment_counts["TN"]
+
+    dr = segment_counts["D"]/P
+    fr = segment_counts["F"]/P
+    us = segment_counts["Us"] / P
+    ue = segment_counts["Ue"] / P
+    tpr = 1 - (dr + fr + us + ue)
+
+    ir = segment_counts["I"]/N
+    mr = segment_counts["M"] / N
+    o_s = segment_counts["Os"] / N
+    oe = segment_counts["Oe"] / N
+    fpr = ir + mr + o_s + oe
+
+    results = {"dr": dr, "fr": fr, "us": us, "ue": ue, "tpr": tpr,
+               "ir": ir, "mr": mr, "os": o_s, "oe": oe, "fpr": fpr }
+    return results
+
+
 def eval_segment_results(ground_truth_events, detected_events, evaluation_start, evaluation_end):
     segments_with_category = get_segments_with_standard_error_categories(ground_truth_events, detected_events,
                                                                          evaluation_start, evaluation_end)
     segments_with_detailed_categories = compute_detailed_error_categories(segments_with_category)
 
-    segment_statistics, normed_statistics = compute_segment_statistics(segments_with_detailed_categories)
+    segment_counts, normed_segment_counts = count_segment_categories(segments_with_detailed_categories)
+    twoset_results = twoset_metrics(segment_counts)
 
-    return segments_with_detailed_categories, segment_statistics, normed_statistics
+    return twoset_results, segments_with_detailed_categories, segment_counts, normed_segment_counts
 
 
 def ward_eval(ground_truth_events, detected_events, evaluation_start, evaluation_end):

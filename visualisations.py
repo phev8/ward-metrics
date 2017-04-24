@@ -39,7 +39,41 @@ def plot_segment_results(segment_results, ground_truth_events, detected_events, 
         plt.draw()
 
 
-def plot_segment_statistics(results):
+def plot_twoset_metrics(results, startangle=120):
+    fig1, axarr = plt.subplots(1, 2)
+
+    # plot positive rates:
+    labels_1 = ["tpr", "us", "ue", "fr", "dr"]
+    values_1 = [
+        results["tpr"],
+        results["us"],
+        results["ue"],
+        results["fr"],
+        results["dr"]
+    ]
+
+    axarr[0].pie(values_1, labels=labels_1, autopct='%1.0f%%', startangle=startangle)
+    axarr[0].axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    # TODO: add title
+
+    # plot negative rates:
+    labels_2 = ["1-fpr", "os", "oe", "mr", "ir"]
+    values_2 = [
+        1-results["fpr"],
+        results["os"],
+        results["oe"],
+        results["mr"],
+        results["ir"]
+    ]
+
+    axarr[1].pie(values_2, labels=labels_2, autopct='%1.0f%%', startangle=startangle)
+    axarr[1].axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    # TODO: add title
+
+    plt.show()
+
+
+def plot_segment_counts(results):
     # TODO: add title
     labels = results.keys()
     values = []
@@ -48,7 +82,9 @@ def plot_segment_statistics(results):
 
     #explode = (0, 0.1, 0, 0)  # only "explode" the 2nd slice (i.e. 'Hogs')
 
+    total = sum(values)
+
     fig1, ax1 = plt.subplots()
-    ax1.pie(values, labels=labels, autopct='%1.0f%%', startangle=90)
+    ax1.pie(values, labels=labels, autopct=lambda p: '{:.0f}'.format(p * total / 100), startangle=90)
     ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
     plt.show()

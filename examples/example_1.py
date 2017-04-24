@@ -1,5 +1,5 @@
 from core_methods import eval_segment_results
-from visualisations import plot_segment_results, plot_segment_statistics
+from visualisations import *
 
 ground_truth_test = [
     (40, 60),
@@ -22,10 +22,8 @@ detection_test = [
 eval_start = 2
 eval_end = 241
 
-segments_results, segment_statistics, normed_segment_statistics = eval_segment_results(ground_truth_test, detection_test, eval_start, eval_end)
-
-print(segment_statistics)
-print(normed_segment_statistics)
+frame_statistics, segments_results, segment_counts, normed_segment_counts = eval_segment_results(ground_truth_test, detection_test, eval_start, eval_end)
 
 plot_segment_results(segments_results, ground_truth_test, detection_test)
-plot_segment_statistics(segment_statistics)
+plot_segment_counts(segment_counts)
+plot_twoset_metrics(frame_statistics)
