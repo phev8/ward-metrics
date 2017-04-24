@@ -1,5 +1,5 @@
-from core_methods import ward_eval
-from visualisations import plot_segment_results
+from core_methods import eval_segment_results
+from visualisations import plot_segment_results, plot_segment_statistics
 
 ground_truth_test = [
     (40, 60),
@@ -22,6 +22,10 @@ detection_test = [
 eval_start = 2
 eval_end = 241
 
-total_results, segments_results = ward_eval(ground_truth_test, detection_test, eval_start, eval_end)
+segments_results, segment_statistics, normed_segment_statistics = eval_segment_results(ground_truth_test, detection_test, eval_start, eval_end)
+
+print(segment_statistics)
+print(normed_segment_statistics)
 
 plot_segment_results(segments_results, ground_truth_test, detection_test)
+plot_segment_statistics(segment_statistics)

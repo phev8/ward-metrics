@@ -189,6 +189,37 @@ def compute_detailed_error_categories(segments):
     return new_segments
 
 
+def compute_segment_statistics(segments):
+    categories = ["TP", "TN", "I", "D", "F", "M", "Os", "Oe", "Us", "Ue"]
+    results = {}
+
+    # Init values:
+    for c in categories:
+        results[c] = 0
+
+    # Calculate total segment length for each category
+    for s in segments:
+        results[s[3]] += s[1] - s[0]
+
+    # Calculate normed values:
+    eval_length = segments[-1][1] - segments[0][0]
+    results_normed = {}
+    for c in categories:
+        results_normed[c] = results[c]/eval_length
+
+    return results, results_normed
+
+
+def eval_segment_results(ground_truth_events, detected_events, evaluation_start, evaluation_end):
+    segments_with_category = get_segments_with_standard_error_categories(ground_truth_events, detected_events,
+                                                                         evaluation_start, evaluation_end)
+    segments_with_detailed_categories = compute_detailed_error_categories(segments_with_category)
+
+    segment_statistics, normed_statistics = compute_segment_statistics(segments_with_detailed_categories)
+
+    return segments_with_detailed_categories, segment_statistics, normed_statistics
+
+
 def ward_eval(ground_truth_events, detected_events, evaluation_start, evaluation_end):
     segments_with_category = get_segments_with_standard_error_categories(ground_truth_events, detected_events, evaluation_start, evaluation_end)
     segments_with_detailed_categories = compute_detailed_error_categories(segments_with_category)
