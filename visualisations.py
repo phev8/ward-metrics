@@ -16,17 +16,20 @@ def plot_segment_results(segment_results, ground_truth_events, detected_events, 
 
     for s in segment_results:
         color = "black"
-        if s[2] == "TP":
+        index_of_cat = 4
+        if s[index_of_cat] == "TP":
             color = "green"
-        elif s[2] == "FP":
+        elif s[index_of_cat] == "FP":
             color = "red"
-        elif s[2] == "FN":
+        elif s[index_of_cat] == "FN":
             color = "yellow"
-        elif s[2] == "TN":
+        elif s[index_of_cat] == "TN":
             color = "blue"
 
         # TODO: format text nicely
-        plt.text((s[1]+s[0])/2 - 2, 0.5, s[3])
+        plt.text((s[1]+s[0])/2 - 1, 0.8, s[2])
+        plt.text((s[1]+s[0])/2 - 1, 0.2, s[3])
+        plt.text((s[1]+s[0])/2 - 2, 0.5, s[5])
         plt.axvspan(s[0], s[1], 0.4, 0.6, color=color)
         plt.axvline(s[0], color="black")
         plt.axvline(s[1], color="black")
