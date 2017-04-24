@@ -104,6 +104,7 @@ def get_segments_with_standard_error_categories(ground_truth_events, detected_ev
             last_segment = (seg_start, seg_end, gt_i, det_i, category)
             segments.append(last_segment)
         else:
+            # Create first segment:
             if evaluation_start is None:
                 seg_start = min(gt_start, d_start)
                 seg_end = min(gt_end, d_end)
@@ -132,97 +133,107 @@ def get_segments_with_standard_error_categories(ground_truth_events, detected_ev
     return segments
 
 
-def compute_detailed_error_categories(segments):
+def score_segment(previous_segment, current_segment, next_segment):
+    if current_segment is None:
+        raise ValueError("current_segment must not be None.")
+    index_of_standard_category = 4
+    current_segment_score = "no score"
+
+    if current_segment[index_of_standard_category] == "TP":
+        current_segment_score = "TP"
+    elif current_segment[index_of_standard_category] == "TN":
+        current_segment_score = "TN"
+    else:
+        # Handle error categories:
+        if previous_segment is not None and next_segment is not None:
+            # normal case (in the middle):
+            if current_segment[index_of_standard_category] == "FP":
+                if (previous_segment[index_of_standard_category] == "TN" or previous_segment[index_of_standard_category] == "FN") and \
+                        (next_segment[index_of_standard_category] == "TN" or next_segment[index_of_standard_category] == "FN"):
+                    current_segment_score = "I"
+                elif previous_segment[index_of_standard_category] == "TP" and next_segment[index_of_standard_category] == "TP":
+                    current_segment_score = "M"
+                elif (previous_segment[index_of_standard_category] == "TN" or previous_segment[index_of_standard_category] == "FN") and \
+                                next_segment[index_of_standard_category] == "TP":
+                    current_segment_score = "Os"
+                elif previous_segment[index_of_standard_category] == "TP" and (
+                        next_segment[index_of_standard_category] == "TN" or next_segment[index_of_standard_category] == "FN"):
+                    current_segment_score = "Oe"
+            elif current_segment[index_of_standard_category] == "FN":
+                if (previous_segment[index_of_standard_category] == "TN" or previous_segment[index_of_standard_category] == "FP") and (
+                        next_segment[index_of_standard_category] == "TN" or next_segment[index_of_standard_category] == "FP"):
+                    current_segment_score = "D"
+                elif previous_segment[index_of_standard_category] == "TP" and next_segment[index_of_standard_category] == "TP":
+                    current_segment_score = "F"
+                elif (previous_segment[index_of_standard_category] == "TN" or previous_segment[index_of_standard_category] == "FP") and \
+                                next_segment[index_of_standard_category] == "TP":
+                    current_segment_score = "Us"
+                elif previous_segment[index_of_standard_category] == "TP" and (
+                        next_segment[index_of_standard_category] == "TN" or next_segment[index_of_standard_category] == "FP"):
+                    current_segment_score = "Ue"
+                    
+        elif previous_segment is None and next_segment is not None:
+            # start case (for the first segment):
+            if current_segment[index_of_standard_category] == "FP":
+                if next_segment[index_of_standard_category] == "TN" or next_segment[index_of_standard_category] == "FN":
+                    current_segment_score = "I"
+                elif next_segment[index_of_standard_category] == "TP":
+                    current_segment_score = "Os"
+            elif current_segment[index_of_standard_category] == "FN":
+                if next_segment[index_of_standard_category] == "TN" or next_segment[index_of_standard_category] == "FP":
+                    current_segment_score = "D"
+                elif next_segment[index_of_standard_category] == "TP":
+                    current_segment_score = "Us"
+
+        elif previous_segment is not None and next_segment is None:
+            # end case (for the last segment):
+            if current_segment[index_of_standard_category] == "FP":
+                if previous_segment[index_of_standard_category] == "TN" or previous_segment[index_of_standard_category] == "FN":
+                    current_segment_score = "I"
+                elif previous_segment[index_of_standard_category] == "TP":
+                    current_segment_score = "Oe"
+            elif current_segment[index_of_standard_category] == "FN":
+                if previous_segment[index_of_standard_category] == "TN" or previous_segment[index_of_standard_category] == "FP":
+                    current_segment_score = "D"
+                elif previous_segment[index_of_standard_category] == "TP":
+                    current_segment_score = "Ue"
+
+        elif previous_segment is None and next_segment is None:
+            # if only one segment is given (exceptional case):
+            if current_segment[index_of_standard_category] == "FP":
+                current_segment_score = "I"
+            elif current_segment[index_of_standard_category] == "FN":
+                current_segment_score = "D"
+
+    return current_segment_score
+
+
+def compute_detailed_segment_scores(segments):
     new_segments = []
-    index_of_cat = 4
-    # TODO: what happens if only one segment
+
+    # Handle special case if only one segment exists:
+    if len(segments) == 1:
+        seg_score = score_segment(None, segments[0], None)
+        n_seg = segments[0] + (seg_score,)  # Create new tuple (append to the end)
+        new_segments.append(n_seg)
+        return new_segments
 
     # handle first segment:
-    new_category = "error"
-    if segments[0][index_of_cat] == "TP":
-        new_category = "TP"
-    elif segments[0][index_of_cat] == "TN":
-        new_category = "TN"
-    elif segments[0][index_of_cat] == "FP":
-        if segments[1][index_of_cat] == "TN" or segments[1][2] == "FN":
-            new_category = "I"
-        elif segments[1][index_of_cat] == "TP":
-            new_category = "Os"
-        else:
-            print("FP follows FP. This shouldn't happen.")
-    elif segments[0][index_of_cat] == "FN":
-        if segments[1][index_of_cat] == "TN" or segments[1][2] == "FP":
-            new_category = "D"
-        elif segments[1][index_of_cat] == "TP":
-            new_category = "Us"
-        else:
-            print("FN follows FN. This shouldn't happen.")
-    else:
-        print(segments[0])
-    n_seg = segments[0] + (new_category,)
+    seg_score = score_segment(None, segments[0], segments[1])
+    n_seg = segments[0] + (seg_score,) # Create new tuple (append to the end)
     new_segments.append(n_seg)
-
 
     # Handle segments in the middle:
     for i in range(1, len(segments) - 1):
-        s_index = i
-        new_category = "error"
-        if segments[s_index][index_of_cat] == "TP":
-            new_category = "TP"
-        elif segments[s_index][index_of_cat] == "TN":
-            new_category = "TN"
-        elif segments[s_index][index_of_cat] == "FP":
-            if (segments[s_index - 1][index_of_cat] == "TN" or segments[s_index - 1][index_of_cat] == "FN") and \
-                    (segments[s_index + 1][index_of_cat] == "TN" or segments[s_index + 1][index_of_cat] == "FN"):
-                new_category = "I"
-            elif segments[s_index - 1][index_of_cat] == "TP" and segments[s_index + 1][index_of_cat] == "TP":
-                new_category = "M"
-            elif (segments[s_index - 1][index_of_cat] == "TN" or segments[s_index - 1][index_of_cat] == "FN") and segments[s_index + 1][index_of_cat] == "TP":
-                new_category = "Os"
-            elif segments[s_index - 1][index_of_cat] == "TP" and (segments[s_index + 1][index_of_cat] == "TN" or segments[s_index + 1][index_of_cat] == "FN"):
-                new_category = "Oe"
-            else:
-                print("FP follows FP. This shouldn't happen.")
-        elif segments[s_index][index_of_cat] == "FN":
-            if (segments[s_index - 1][index_of_cat] == "TN" or segments[s_index - 1][index_of_cat] == "FP") and (segments[s_index + 1][index_of_cat] == "TN" or segments[s_index + 1][index_of_cat] == "FP"):
-                new_category = "D"
-            elif segments[s_index - 1][index_of_cat] == "TP" and segments[s_index + 1][index_of_cat] == "TP":
-                new_category = "F"
-            elif (segments[s_index - 1][index_of_cat] == "TN" or segments[s_index - 1][index_of_cat] == "FP") and segments[s_index + 1][index_of_cat] == "TP":
-                new_category = "Us"
-            elif segments[s_index - 1][index_of_cat] == "TP" and (segments[s_index + 1][index_of_cat] == "TN" or segments[s_index + 1][index_of_cat] == "FP"):
-                new_category = "Ue"
-            else:
-                print("FN follows FN. This shouldn't happen.")
-        else:
-            print(segments[s_index])
-
-        n_seg = segments[s_index] + (new_category,)
+        seg_score = score_segment(segments[i-1], segments[i], segments[i+1])
+        n_seg = segments[i] + (seg_score,)  # Create new tuple (append to the end)
         new_segments.append(n_seg)
 
     # handle last segment:
-    s_index = -1
-    if segments[s_index][index_of_cat] == "TP":
-        new_category = "TP"
-    elif segments[s_index][index_of_cat] == "TN":
-        new_category = "TN"
-    elif segments[s_index][index_of_cat] == "FP":
-        if segments[s_index-1][index_of_cat] == "TN" or segments[s_index-1][index_of_cat] == "FN":
-            new_category = "I"
-        elif segments[s_index-1][index_of_cat] == "TP":
-            new_category = "Oe"
-        else:
-            print("FP follows FP. This shouldn't happen.")
-    elif segments[s_index][index_of_cat] == "FN":
-        if segments[s_index-1][index_of_cat] == "TN" or segments[s_index - 1][index_of_cat] == "FP":
-            new_category = "D"
-        elif segments[s_index-1][index_of_cat] == "TP":
-            new_category = "Ue"
-        else:
-            print("FN follows FN. This shouldn't happen.")
-
-    n_seg = segments[s_index] + (new_category,)
+    seg_score = score_segment(segments[-2], segments[-1], None)
+    n_seg = segments[-1] + (seg_score,)  # Create new tuple (append to the end)
     new_segments.append(n_seg)
+
     return new_segments
 
 
@@ -271,7 +282,7 @@ def twoset_metrics(segment_counts):
 def eval_segment_results(ground_truth_events, detected_events, evaluation_start, evaluation_end):
     segments_with_category = get_segments_with_standard_error_categories(ground_truth_events, detected_events,
                                                                          evaluation_start, evaluation_end)
-    segments_with_detailed_categories = compute_detailed_error_categories(segments_with_category)
+    segments_with_detailed_categories = compute_detailed_segment_scores(segments_with_category)
 
     segment_counts, normed_segment_counts = count_segment_categories(segments_with_detailed_categories)
     twoset_results = twoset_metrics(segment_counts)
@@ -281,7 +292,7 @@ def eval_segment_results(ground_truth_events, detected_events, evaluation_start,
 
 def eval_events(ground_truth_events, detected_events, evaluation_start, evaluation_end):
     segments_with_category = get_segments_with_standard_error_categories(ground_truth_events, detected_events, evaluation_start, evaluation_end)
-    segments_with_detailed_categories = compute_detailed_error_categories(segments_with_category)
+    segments_with_detailed_categories = compute_detailed_segment_scores(segments_with_category)
 
     # TODO: calculate statistics
 
