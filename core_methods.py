@@ -134,6 +134,16 @@ def get_segments_with_standard_error_categories(ground_truth_events, detected_ev
 
 
 def score_segment(previous_segment, current_segment, next_segment):
+    """
+    Computing scores for current segment based on it's surroundings
+    :param previous_segment: segment tuple for previous segment defined as (start, end, gt_event_index, det_event_index, standard_score) or None
+    :param current_segment: segment tuple for current segment defined as (start, end, gt_event_index, det_event_index, standard_score)
+    :param next_segment: segment tuple for next segment defined as (start, end, gt_event_index, det_event_index, standard_score) or None
+    :return: return one of the following categories: 'TP' - true positive, 'TN' - true negative,
+    'I' - insertion, 'M' - merge, 'D' - deletion, 'F' - fragmenting,
+    'Os' - start overfill, 'Oe' - end overfill, 'Us' - start underfill, 'Ue' - end underfill,
+    or 'no score' for errors
+    """
     if current_segment is None:
         raise ValueError("current_segment must not be None.")
     index_of_standard_category = 4
@@ -237,7 +247,7 @@ def compute_detailed_segment_scores(segments):
     return new_segments
 
 
-def count_segment_categories(segments):
+def count_segment_scores(segments):
     categories = ["TP", "TN", "I", "D", "F", "M", "Os", "Oe", "Us", "Ue"]
     results = {}
 
@@ -279,12 +289,60 @@ def twoset_metrics(segment_counts):
     return results
 
 
+def _get_ground_truth_event_index_list(segments):
+    index_list = []
+    for s in segments:
+        if s[2] not in index_list and s[2] != -1:
+            index_list.append(s[2])
+    return index_list
+
+
+def _get_detected_event_index_list(segments):
+    index_list = []
+    for s in segments:
+        if s[3] not in index_list and s[3] != -1:
+            index_list.append(s[3])
+    return index_list
+
+
+def _get_segments_for_ground_truth_event(segments, event_index):
+    # TODO
+    return
+
+
+def _get_segments_for_detected_event(segments, event_index):
+    # TODO
+    return
+
+
+def event_metrics(segments):
+    # TODO
+
+    detected_indexes = _get_detected_event_index_list(segments)
+    ground_truth_indexes = _get_ground_truth_event_index_list(segments)
+
+    print(ground_truth_indexes, detected_indexes)
+    return
+
+
 def eval_segment_results(ground_truth_events, detected_events, evaluation_start, evaluation_end):
+    """
+    Segment-based evaluation (frame - length based) - shows the amount of each error type on the overall dataset segments
+    :param ground_truth_events: list of tuples (start, end) or lists [start, end], as numeric values (e.g. frame number or posix timestamp)
+    :param detected_events: list of tuples (start, end) or lists [start, end], as numeric values (e.g. frame number or posix timestamp)
+    :param evaluation_start: numeric value or None if start of the first event should be used for statistics
+    :param evaluation_end: numeric value of None
+    :return:
+    - result for the 2SET metrics
+    - list of detected segments including standard and detailed score categories
+    - dictionary with frame counts/length of segments for each category
+    - same as before but normed
+    """
     segments_with_category = get_segments_with_standard_error_categories(ground_truth_events, detected_events,
                                                                          evaluation_start, evaluation_end)
     segments_with_detailed_categories = compute_detailed_segment_scores(segments_with_category)
 
-    segment_counts, normed_segment_counts = count_segment_categories(segments_with_detailed_categories)
+    segment_counts, normed_segment_counts = count_segment_scores(segments_with_detailed_categories)
     twoset_results = twoset_metrics(segment_counts)
 
     return twoset_results, segments_with_detailed_categories, segment_counts, normed_segment_counts
@@ -295,6 +353,6 @@ def eval_events(ground_truth_events, detected_events, evaluation_start, evaluati
     segments_with_detailed_categories = compute_detailed_segment_scores(segments_with_category)
 
     # TODO: calculate statistics
-
+    event_results = event_metrics(segments_with_detailed_categories)
     # TODO: return accumulated statistics as dictonary, segments with categories
-    return None, segments_with_detailed_categories
+    return event_results
