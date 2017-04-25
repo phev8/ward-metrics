@@ -42,7 +42,7 @@ setup(
 
         # Indicate who your project is intended for
         'Intended Audience :: Science/Research',
-        'Topic :: Machine Learning :: Evaluation Tools',
+        'Topic :: Scientific/Engineering',
 
         # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: MIT License',
