@@ -25,5 +25,7 @@ detection_test = [
 ]
 
 
-gt_event_scores, det_event_scores = eval_events(ground_truth_test, detection_test, 3, 260)
-plot_events_with_event_scores(gt_event_scores, det_event_scores, ground_truth_test, detection_test)
+gt_event_scores, det_event_scores, results = eval_events(ground_truth_test, detection_test, 3, 260)
+
+plot_events_with_event_scores(gt_event_scores, det_event_scores, ground_truth_test, detection_test, show=False)
+plot_event_analysis_diagram(results)

@@ -114,3 +114,95 @@ def plot_segment_counts(results):
 
 
 # TODO: plot event graph
+def plot_event_analysis_diagram(event_results):
+    fig = plt.figure(figsize=(10, 2))
+
+    total = event_results["total_gt"] + event_results["total_det"] - event_results["C"]
+    print(total)
+
+
+    y_min = 0.2
+    y_max = 0.8
+    width = 0.02
+    text_x_offset = 0.01
+    text_y_pos_1 = 0.6
+    text_y_pos_2 = 0.4
+
+    current_score = "D"
+    current_x_start = 0
+    current_x_end = event_results[current_score]
+    plt.axvspan(current_x_start, current_x_end, y_min, y_max, color="red")
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+
+
+    current_score = "F"
+    current_x_start = current_x_end
+    current_x_end += event_results[current_score]
+    plt.axvspan(current_x_start, current_x_end,  y_min, y_max, color="yellow")
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+
+
+    current_score = "FM"
+    current_x_start = current_x_end
+    current_x_end += event_results[current_score]
+    plt.axvspan(current_x_start, current_x_end,  y_min, y_max, color="orange")
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+
+
+    current_score = "M"
+    current_x_start = current_x_end
+    current_x_end += event_results[current_score]
+    plt.axvspan(current_x_start, current_x_end,  y_min, y_max, color="darkgreen")
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+
+
+    current_score = "C"
+    current_x_start = current_x_end
+    current_x_end += event_results[current_score]
+    plt.axvspan(current_x_start, current_x_end,  y_min, y_max, color="lightgreen")
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+
+    current_score = "M'"
+    current_x_start = current_x_end
+    current_x_end += event_results[current_score]
+    plt.axvspan(current_x_start, current_x_end,  y_min, y_max, color="darkgreen")
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+
+
+    current_score = "FM'"
+    current_x_start = current_x_end
+    current_x_end += event_results[current_score]
+    plt.axvspan(current_x_start, current_x_end, y_min, y_max, color="orange")
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+
+
+    current_score = "F'"
+    current_x_start = current_x_end
+    current_x_end += event_results[current_score]
+    plt.axvspan(current_x_start, current_x_end, y_min, y_max, color="yellow")
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+
+    current_score = "I'"
+    current_x_start = current_x_end
+    current_x_end += event_results[current_score]
+    plt.axvspan(current_x_start, current_x_end, y_min, y_max, color="red")
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+
+    # Draw line for total events:
+    plt.axvspan(0, event_results["total_gt"], y_max, y_max + width, color="black")
+    plt.axvspan( total - event_results["total_det"], total, y_min, y_min - width, color="black")
+
+    # TODO: add percentage values
+
+    plt.tight_layout()
+    plt.show()
+

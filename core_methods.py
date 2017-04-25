@@ -408,11 +408,27 @@ def compute_event_scores(segments):
     return gt_event_scores, det_event_scores
 
 
+def _count_event_scores(gt_event_scores, detection_scores):
+    results = {
+        "total_gt": len(gt_event_scores),
+        "total_det": len(detection_scores),
+        "D": gt_event_scores.count("D"),
+        "F": gt_event_scores.count("F"),
+        "FM": gt_event_scores.count("FM"),
+        "M": gt_event_scores.count("M"),
+        "C": gt_event_scores.count("C"),
+        "M'": detection_scores.count("M'"),
+        "FM'": detection_scores.count("FM'"),
+        "F'": detection_scores.count("F'"),
+        "I'": detection_scores.count("I'")
+    }
+    return results
+
+
 def event_metrics(segments):
     gt_event_scores, det_event_scores = compute_event_scores(segments)
-    print(gt_event_scores)
-    print(det_event_scores)
-    return gt_event_scores, det_event_scores
+    event_results = _count_event_scores(gt_event_scores, det_event_scores)
+    return gt_event_scores, det_event_scores, event_results
 
 
 def eval_segment_results(ground_truth_events, detected_events, evaluation_start, evaluation_end):
@@ -442,7 +458,6 @@ def eval_events(ground_truth_events, detected_events, evaluation_start, evaluati
     segments_with_category = get_segments_with_standard_error_categories(ground_truth_events, detected_events, evaluation_start, evaluation_end)
     segments_with_detailed_categories = compute_detailed_segment_scores(segments_with_category)
 
-    # TODO: calculate statistics
-    event_results = event_metrics(segments_with_detailed_categories)
-    # TODO: return accumulated statistics as dictonary, segments with categories
-    return event_results
+    gt_scores, detection_scores, score_statistics = event_metrics(segments_with_detailed_categories)
+
+    return gt_scores, detection_scores, score_statistics
