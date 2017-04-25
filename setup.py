@@ -16,7 +16,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    use_scm_version=True,
+    use_scm_version={"write_to": "wardmetrics/version.py"},
     setup_requires=['setuptools_scm'],
 
     description='Tools for event-based evaluation for activity recognition problems.',

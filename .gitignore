@@ -4,3 +4,4 @@
 build
 dist
 ward_metrics.egg-info
+version.py
