@@ -24,6 +24,6 @@ eval_end = 241
 
 frame_statistics, segments_results, segment_counts, normed_segment_counts = eval_segment_results(ground_truth_test, detection_test, eval_start, eval_end)
 
-plot_segment_results(segments_results, ground_truth_test, detection_test)
+plot_events_with_segment_scores(segments_results, ground_truth_test, detection_test)
 plot_segment_counts(segment_counts)
 plot_twoset_metrics(frame_statistics)

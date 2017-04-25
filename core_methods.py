@@ -306,23 +306,113 @@ def _get_detected_event_index_list(segments):
 
 
 def _get_segments_for_ground_truth_event(segments, event_index):
-    # TODO
-    return
+    return [s for s in segments if s[2] == event_index]
 
 
 def _get_segments_for_detected_event(segments, event_index):
-    # TODO
-    return
+    return [s for s in segments if s[3] == event_index]
 
 
-def event_metrics(segments):
-    # TODO
+def _score_ground_truth_event(segments_for_event):
+    # get segment score values as a list:
+    segment_scores = []
+    for s in segments_for_event:
+        segment_scores.append(s[5])
 
+    # get event's score:
+    current_event_score = ""
+    if segment_scores.count("TP") == 1:
+        current_event_score += "C"
+    elif len(segment_scores) == 1 and segment_scores.count("D") == 1:
+        current_event_score += "D"
+
+    if segment_scores.count("F") > 0:
+        current_event_score += "F"
+
+    return current_event_score
+
+
+def _score_detected_event(segments_for_event):
+    # get segment score values as a list:
+    segment_scores = []
+    for s in segments_for_event:
+        segment_scores.append(s[5])
+
+    # get event's score:
+    current_event_score = ""
+    if segment_scores.count("TP") == 1:
+        current_event_score += "C"
+    elif len(segment_scores) == 1 and segment_scores.count("I") == 1:
+        current_event_score += "I'"
+
+    if segment_scores.count("M") > 0:
+        current_event_score += "M'"
+
+    return current_event_score
+
+
+def _have_overlapping_segments(segments_1, segments_2):
+    overlap = False
+    for s in segments_1:
+        if s in segments_2:
+            overlap = True
+            break
+    return overlap
+
+
+def compute_event_scores(segments):
+    # Get list of events indexes:
     detected_indexes = _get_detected_event_index_list(segments)
     ground_truth_indexes = _get_ground_truth_event_index_list(segments)
 
-    print(ground_truth_indexes, detected_indexes)
-    return
+    # get score for each gt event:
+    gt_event_scores = []
+    for i in ground_truth_indexes:
+        current_segments = _get_segments_for_ground_truth_event(segments, i)
+        e_score = _score_ground_truth_event(current_segments)
+        gt_event_scores.append(e_score)
+
+    # get score for each detection event
+    det_event_scores = []
+    for i in detected_indexes:
+        current_segments = _get_segments_for_detected_event(segments, i)
+        e_score = _score_detected_event(current_segments)
+        det_event_scores.append(e_score)
+
+    # cross check event scores for merging and fragmented results:
+    for i in ground_truth_indexes:
+        for j in detected_indexes:
+            segments_gt = _get_segments_for_ground_truth_event(segments, i)
+            segments_det = _get_segments_for_detected_event(segments, j)
+            if _have_overlapping_segments(segments_gt, segments_det):
+                # change ground truth event score if needed:
+                if det_event_scores[j] == "M'" or det_event_scores[j] == "M'F'":
+                    gt_event_scores[i] += "M"
+
+                # change detected event score if needed:
+                if gt_event_scores[i] == "F" or gt_event_scores[i] == "FM":
+                    det_event_scores[j] += "F'"
+
+    # clean up event score labels:
+    for i in range(len(gt_event_scores)):
+        if "F" in gt_event_scores[i] and "M" in gt_event_scores[i]:
+            gt_event_scores[i] = "FM"
+        elif "C" in gt_event_scores[i] and "M" in gt_event_scores[i]:
+            gt_event_scores[i] = "M"
+    for i in range(len(det_event_scores)):
+        if "F" in det_event_scores[i] and "M" in det_event_scores[i]:
+            det_event_scores[i] = "FM'"
+        if "C" in det_event_scores[i] and "F" in det_event_scores[i]:
+            det_event_scores[i] = "F'"
+
+    return gt_event_scores, det_event_scores
+
+
+def event_metrics(segments):
+    gt_event_scores, det_event_scores = compute_event_scores(segments)
+    print(gt_event_scores)
+    print(det_event_scores)
+    return gt_event_scores, det_event_scores
 
 
 def eval_segment_results(ground_truth_events, detected_events, evaluation_start, evaluation_end):

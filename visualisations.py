@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-def plot_segment_results(segment_results, ground_truth_events, detected_events, use_datetime_x=False, show=True):
+def plot_events_with_segment_scores(segment_results, ground_truth_events, detected_events, use_datetime_x=False, show=True):
     fig = plt.figure(figsize=(10, 3))
 
     # TODO: convert times to datetime if flag is set
@@ -33,6 +33,26 @@ def plot_segment_results(segment_results, ground_truth_events, detected_events, 
         plt.axvspan(s[0], s[1], 0.4, 0.6, color=color)
         plt.axvline(s[0], color="black")
         plt.axvline(s[1], color="black")
+
+    plt.tight_layout()
+
+    if show:
+        plt.show()
+    else:
+        plt.draw()
+
+
+def plot_events_with_event_scores(gt_event_scores, detected_event_scores, ground_truth_events, detected_events, show=True):
+    fig = plt.figure(figsize=(10, 3))
+    for i in range(len(detected_events)):
+        d = detected_events[i]
+        plt.axvspan(d[0], d[1], 0, 0.5)
+        plt.text((d[1] + d[0]) / 2, 0.2, detected_event_scores[i])
+
+    for i in range(len(ground_truth_events)):
+        gt = ground_truth_events[i]
+        plt.axvspan(gt[0], gt[1], 0.5, 1)
+        plt.text((gt[1] + gt[0]) / 2, 0.8, gt_event_scores[i])
 
     plt.tight_layout()
 
@@ -91,3 +111,6 @@ def plot_segment_counts(results):
     ax1.pie(values, labels=labels, autopct=lambda p: '{:.0f}'.format(p * total / 100), startangle=90)
     ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
     plt.show()
+
+
+# TODO: plot event graph
