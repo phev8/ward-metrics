@@ -1,2 +1,6 @@
 .idea
 *.pyc
+.eggs
+build
+dist
+ward_metrics.egg-info
