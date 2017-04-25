@@ -27,9 +27,9 @@ def plot_events_with_segment_scores(segment_results, ground_truth_events, detect
             color = "blue"
 
         # TODO: format text nicely
-        plt.text((s[1]+s[0])/2 - 1, 0.8, s[2])
-        plt.text((s[1]+s[0])/2 - 1, 0.2, s[3])
-        plt.text((s[1]+s[0])/2 - 2, 0.5, s[5])
+        plt.text((s[1]+s[0])/2, 0.8, s[2], horizontalalignment='center', verticalalignment='center')
+        plt.text((s[1]+s[0])/2, 0.2, s[3], horizontalalignment='center', verticalalignment='center')
+        plt.text((s[1]+s[0])/2, 0.5, s[5], horizontalalignment='center', verticalalignment='center')
         plt.axvspan(s[0], s[1], 0.4, 0.6, color=color)
         plt.axvline(s[0], color="black")
         plt.axvline(s[1], color="black")
@@ -47,12 +47,12 @@ def plot_events_with_event_scores(gt_event_scores, detected_event_scores, ground
     for i in range(len(detected_events)):
         d = detected_events[i]
         plt.axvspan(d[0], d[1], 0, 0.5)
-        plt.text((d[1] + d[0]) / 2, 0.2, detected_event_scores[i])
+        plt.text((d[1] + d[0]) / 2, 0.2, detected_event_scores[i], horizontalalignment='center', verticalalignment='center')
 
     for i in range(len(ground_truth_events)):
         gt = ground_truth_events[i]
         plt.axvspan(gt[0], gt[1], 0.5, 1)
-        plt.text((gt[1] + gt[0]) / 2, 0.8, gt_event_scores[i])
+        plt.text((gt[1] + gt[0]) / 2, 0.8, gt_event_scores[i], horizontalalignment='center', verticalalignment='center')
 
     plt.tight_layout()
 
@@ -113,95 +113,173 @@ def plot_segment_counts(results):
     plt.show()
 
 
-# TODO: plot event graph
-def plot_event_analysis_diagram(event_results):
+def plot_event_analysis_diagram(event_results, fontsize=10, use_percentage=False):
     fig = plt.figure(figsize=(10, 2))
 
     total = event_results["total_gt"] + event_results["total_det"] - event_results["C"]
-    print(total)
 
-
-    y_min = 0.2
-    y_max = 0.8
+    # Layout settings:
+    y_min = 0.3
+    y_max = 0.7
     width = 0.02
-    text_x_offset = 0.01
-    text_y_pos_1 = 0.6
+    text_x_offset = 0
+    text_y_pos_1 = 0.55
     text_y_pos_2 = 0.4
 
+    # Color settings:
+    cmap = plt.get_cmap("Paired")
+    color_deletion = cmap(4)
+    color_fragmented = cmap(6)
+    color_fragmented_merged = cmap(0)
+    color_merged = cmap(8)
+    color_correct = cmap(3)
+    color_merging = cmap(9)
+    color_merging_fragmenting = cmap(1)
+    color_fragmenting = cmap(7)
+    color_insertion = cmap(5)
+
+    # Show deletions:
     current_score = "D"
     current_x_start = 0
     current_x_end = event_results[current_score]
-    plt.axvspan(current_x_start, current_x_end, y_min, y_max, color="red")
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+    plt.axvspan(current_x_start, current_x_end, y_min, y_max, color=color_deletion)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score, fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
+    if use_percentage:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, "{:.0f}".format(event_results[current_score]*100/event_results["total_gt"]) + "%",
+                    fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
+    else:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]),
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
 
 
+    # Show fragmented events:
     current_score = "F"
     current_x_start = current_x_end
     current_x_end += event_results[current_score]
-    plt.axvspan(current_x_start, current_x_end,  y_min, y_max, color="yellow")
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+    plt.axvspan(current_x_start, current_x_end,  y_min, y_max, color=color_fragmented)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score, fontsize=fontsize,
+             horizontalalignment='center', verticalalignment='center')
+    if use_percentage:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2,
+                 "{:.0f}".format(event_results[current_score] * 100 / event_results["total_gt"]) + "%",
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
+    else:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]),
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
 
-
+    # Show fragmented and merged events:
     current_score = "FM"
     current_x_start = current_x_end
     current_x_end += event_results[current_score]
-    plt.axvspan(current_x_start, current_x_end,  y_min, y_max, color="orange")
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+    plt.axvspan(current_x_start, current_x_end,  y_min, y_max, color=color_fragmented_merged)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score, fontsize=fontsize,
+             horizontalalignment='center', verticalalignment='center')
+    if use_percentage:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2,
+                 "{:.0f}".format(event_results[current_score] * 100 / event_results["total_gt"]) + "%",
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
+    else:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]),
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
 
-
+    # Show merged events:
     current_score = "M"
     current_x_start = current_x_end
     current_x_end += event_results[current_score]
-    plt.axvspan(current_x_start, current_x_end,  y_min, y_max, color="darkgreen")
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+    plt.axvspan(current_x_start, current_x_end,  y_min, y_max, color=color_merged)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score, fontsize=fontsize,
+             horizontalalignment='center', verticalalignment='center')
+    if use_percentage:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2,
+                 "{:.0f}".format(event_results[current_score] * 100 / event_results["total_gt"]) + "%",
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
+    else:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]),
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
 
-
+    # Show correct events:
     current_score = "C"
     current_x_start = current_x_end
     current_x_end += event_results[current_score]
-    plt.axvspan(current_x_start, current_x_end,  y_min, y_max, color="lightgreen")
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+    plt.axvspan(current_x_start, current_x_end,  y_min, y_max, color=color_correct)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score, fontsize=fontsize,
+             horizontalalignment='center', verticalalignment='center')
+    if use_percentage:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2,
+                 "{:.0f}".format(event_results[current_score] * 100 / event_results["total_gt"]) + "%/" + "{:.0f}".format(event_results[current_score] * 100 / event_results["total_det"]) + "%",
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
+    else:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]),
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
 
+    # Show merging detections:
     current_score = "M'"
     current_x_start = current_x_end
     current_x_end += event_results[current_score]
-    plt.axvspan(current_x_start, current_x_end,  y_min, y_max, color="darkgreen")
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+    plt.axvspan(current_x_start, current_x_end,  y_min, y_max, color=color_merging)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score, fontsize=fontsize,
+             horizontalalignment='center', verticalalignment='center')
+    if use_percentage:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2,
+                 "{:.0f}".format(event_results[current_score] * 100 / event_results["total_det"]) + "%",
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
+    else:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]),
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
 
-
+    # Show fragmenting and merging detections:
     current_score = "FM'"
     current_x_start = current_x_end
     current_x_end += event_results[current_score]
-    plt.axvspan(current_x_start, current_x_end, y_min, y_max, color="orange")
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+    plt.axvspan(current_x_start, current_x_end, y_min, y_max, color=color_merging_fragmenting)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score, fontsize=fontsize,
+             horizontalalignment='center', verticalalignment='center')
+    if use_percentage:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2,
+                 "{:.0f}".format(event_results[current_score] * 100 / event_results["total_det"]) + "%",
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
+    else:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]),
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
 
-
+    # Show fragmenting detections:
     current_score = "F'"
     current_x_start = current_x_end
     current_x_end += event_results[current_score]
-    plt.axvspan(current_x_start, current_x_end, y_min, y_max, color="yellow")
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+    plt.axvspan(current_x_start, current_x_end, y_min, y_max, color=color_fragmenting)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score, fontsize=fontsize,
+             horizontalalignment='center', verticalalignment='center')
+    if use_percentage:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2,
+                 "{:.0f}".format(event_results[current_score] * 100 / event_results["total_det"]) + "%",
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
+    else:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]),
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
 
+    # Show insertions:
     current_score = "I'"
     current_x_start = current_x_end
     current_x_end += event_results[current_score]
-    plt.axvspan(current_x_start, current_x_end, y_min, y_max, color="red")
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score)
-    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]))
+    plt.axvspan(current_x_start, current_x_end, y_min, y_max, color=color_insertion)
+    plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_1, current_score, fontsize=fontsize,
+             horizontalalignment='center', verticalalignment='center')
+    if use_percentage:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2,
+                 "{:.0f}".format(event_results[current_score] * 100 / event_results["total_det"]) + "%",
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
+    else:
+        plt.text((current_x_start + current_x_end) / 2 - text_x_offset, text_y_pos_2, str(event_results[current_score]),
+                 fontsize=fontsize, horizontalalignment='center', verticalalignment='center')
 
     # Draw line for total events:
     plt.axvspan(0, event_results["total_gt"], y_max, y_max + width, color="black")
     plt.axvspan( total - event_results["total_det"], total, y_min, y_min - width, color="black")
 
-    # TODO: add percentage values
+    plt.text((0 + event_results["total_gt"]) / 2, 0.8, "Actual events (total=" + str(event_results["total_gt"]) + ")", horizontalalignment='center',
+        verticalalignment='center')
+    plt.text((2*total - event_results["total_det"]) / 2, 0.2, "Detected events (total=" + str(event_results["total_det"]) + ")", horizontalalignment='center',
+        verticalalignment='center')
 
     plt.tight_layout()
     plt.show()

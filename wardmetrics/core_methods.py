@@ -431,7 +431,7 @@ def event_metrics(segments):
     return gt_event_scores, det_event_scores, event_results
 
 
-def eval_segment_results(ground_truth_events, detected_events, evaluation_start, evaluation_end):
+def eval_segment_results(ground_truth_events, detected_events, evaluation_start=None, evaluation_end=None):
     """
     Segment-based evaluation (frame - length based) - shows the amount of each error type on the overall dataset segments
     :param ground_truth_events: list of tuples (start, end) or lists [start, end], as numeric values (e.g. frame number or posix timestamp)
@@ -454,7 +454,7 @@ def eval_segment_results(ground_truth_events, detected_events, evaluation_start,
     return twoset_results, segments_with_detailed_categories, segment_counts, normed_segment_counts
 
 
-def eval_events(ground_truth_events, detected_events, evaluation_start, evaluation_end):
+def eval_events(ground_truth_events, detected_events, evaluation_start=None, evaluation_end=None):
     segments_with_category = get_segments_with_standard_error_categories(ground_truth_events, detected_events, evaluation_start, evaluation_end)
     segments_with_detailed_categories = compute_detailed_segment_scores(segments_with_category)
 
