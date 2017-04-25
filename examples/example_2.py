@@ -1,5 +1,5 @@
-from core_methods import eval_events
-from visualisations import *
+from wardmetrics.core_methods import eval_events
+from wardmetrics.visualisations import *
 
 ground_truth_test = [
     (40, 60),
