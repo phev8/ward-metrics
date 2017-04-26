@@ -12,6 +12,7 @@ def plot_events_with_segment_scores(segment_results, ground_truth_events, detect
     :return:
     """
     fig = plt.figure(figsize=(10, 3))
+    a = 3
 
     # TODO: convert times to datetime if flag is set
 
