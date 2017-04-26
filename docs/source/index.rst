@@ -10,6 +10,12 @@ Welcome to ward-metrics's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   intro
+   tutorial
+   core-methods
+   visualisations
+   utils
+
 
 
 Indices and tables
