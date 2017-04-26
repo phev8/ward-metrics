@@ -433,16 +433,31 @@ def event_metrics(segments):
 
 def eval_segment_results(ground_truth_events, detected_events, evaluation_start=None, evaluation_end=None):
     """
-    Segment-based evaluation (frame - length based) - shows the amount of each error type on the overall dataset segments
-    :param ground_truth_events: list of tuples (start, end) or lists [start, end], as numeric values (e.g. frame number or posix timestamp)
-    :param detected_events: list of tuples (start, end) or lists [start, end], as numeric values (e.g. frame number or posix timestamp)
-    :param evaluation_start: numeric value or None if start of the first event should be used for statistics
-    :param evaluation_end: numeric value of None
-    :return:
-    - result for the 2SET metrics
-    - list of detected segments including standard and detailed score categories
-    - dictionary with frame counts/length of segments for each category
-    - same as before but normed
+    Segment-based evaluation (frame - length based)
+
+    Computes and scores segments and returns the occurrences of each error type in the overall dataset segments
+
+    Args
+    ----
+        ground_truth_events: list of tuples (start, end) or lists [start, end]
+            numeric values (e.g. frame number or posix timestamp) for ground truth events' start and end times
+        detected_events: list of tuples (start, end) or lists [start, end]
+            numeric values (e.g. frame number or posix timestamp) for detected events' start and end times
+        evaluation_start: numeric value or None
+            This should be the first segment's start value. None indicates that start of the first event should be used.
+        evaluation_end: numeric value or None
+            This should be the first segment's start value. None indicates that start of the first event should be used.
+
+    Returns
+    -------
+        twoset_results: dictionary
+            result for the 2SET metrics as a dictonary
+        segments_with_detailed_categories: list of tuples
+            list of detected segments including standard and detailed score categories
+        segment_counts: dictionary
+            frame counts/length of segments for each category
+        normed_segment_counts: dictionary
+            same as before but normed
     """
     segments_with_category = get_segments_with_standard_error_categories(ground_truth_events, detected_events,
                                                                          evaluation_start, evaluation_end)

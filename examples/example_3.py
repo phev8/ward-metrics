@@ -43,5 +43,6 @@ print("Using version",  wardmetrics.__version__)
 gt_event_scores, det_event_scores, results = eval_events(ground_truth_test, detection_test)
 
 plot_events_with_event_scores(gt_event_scores, det_event_scores, ground_truth_test, detection_test, show=False)
+
 plot_event_analysis_diagram(results, fontsize=8, use_percentage=True)
 #plot_event_analysis_diagram(results)
