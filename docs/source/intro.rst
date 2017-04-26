@@ -19,7 +19,7 @@ To update to the latest version you can call (command line)::
     pip install ward-metrics --upgrade
 
 
-To import the packege in the project your can simply write::
+To import the package in the project your can simply write::
 
     import wardmetrics
 

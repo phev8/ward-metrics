@@ -17,7 +17,6 @@ Welcome to ward-metrics's documentation!
    utils
 
 
-
 Indices and tables
 ==================
 

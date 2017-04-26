@@ -9,4 +9,4 @@ pip install ward-metrics
 ```
 
 # Usage and documentation
-For examples and documentation check out the documentation website at (http://ward-metrics.readthedocs.io).
+For examples and documentation check out the documentation website at [http://ward-metrics.readthedocs.io].

@@ -2,6 +2,15 @@ import matplotlib.pyplot as plt
 
 
 def plot_events_with_segment_scores(segment_results, ground_truth_events, detected_events, use_datetime_x=False, show=True):
+    """
+    Test
+    :param segment_results:
+    :param ground_truth_events:
+    :param detected_events:
+    :param use_datetime_x:
+    :param show:
+    :return:
+    """
     fig = plt.figure(figsize=(10, 3))
 
     # TODO: convert times to datetime if flag is set
@@ -114,6 +123,22 @@ def plot_segment_counts(results):
 
 
 def plot_event_analysis_diagram(event_results, fontsize=10, use_percentage=False):
+    """ Plot the event analysis diagram (EAD) for the given results
+
+    Visualisation of the distribution of specific error types either with the actual event count or
+    showing the percentage of the total events. Elements of the plot can be adjusted (like color, fontsize etc.)
+
+    Args:
+        event_results (dictionary): Dictionary object with ...
+
+    Keyword Arguments:
+        fontsize (int): ...
+        use_percentage (bool): ...
+        color_merging (todo): ...
+
+    Returns:
+        ...
+    """
     fig = plt.figure(figsize=(10, 2))
 
     total = event_results["total_gt"] + event_results["total_det"] - event_results["C"]
