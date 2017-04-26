@@ -9,7 +9,7 @@ The package implements the methods proposed by :cite:`ward2011performance` besid
 We provide also useful functions to interface with other modules of your activity recognition workflow and visualisation tools in the package.
 
 Installation
-============
+------------
 Easiest way is to install it with pip (command line)::
 
     pip install ward-metrics
