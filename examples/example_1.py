@@ -1,4 +1,4 @@
-from wardmetrics.core_methods import eval_segment_results
+from wardmetrics.core_methods import eval_segments
 from wardmetrics.visualisations import *
 
 ground_truth_test = [
@@ -22,7 +22,7 @@ detection_test = [
 eval_start = 2
 eval_end = 241
 
-frame_statistics, segments_results, segment_counts, normed_segment_counts = eval_segment_results(ground_truth_test, detection_test, eval_start, eval_end)
+frame_statistics, segments_results, segment_counts, normed_segment_counts = eval_segments(ground_truth_test, detection_test, eval_start, eval_end)
 
 plot_events_with_segment_scores(segments_results, ground_truth_test, detection_test)
 plot_segment_counts(segment_counts)

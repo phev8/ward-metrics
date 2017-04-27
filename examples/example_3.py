@@ -40,9 +40,11 @@ detection_test = [
 
 print("Using version",  wardmetrics.__version__)
 
-gt_event_scores, det_event_scores, results = eval_events(ground_truth_test, detection_test)
+gt_event_scores, det_event_scores, detailed_scores, standard_scores = eval_events(ground_truth_test, detection_test)
+
+print(standard_scores)
 
 plot_events_with_event_scores(gt_event_scores, det_event_scores, ground_truth_test, detection_test, show=False)
 
-plot_event_analysis_diagram(results, fontsize=8, use_percentage=True)
+plot_event_analysis_diagram(detailed_scores, fontsize=8, use_percentage=True)
 #plot_event_analysis_diagram(results)

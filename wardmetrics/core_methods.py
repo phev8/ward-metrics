@@ -1,5 +1,3 @@
-
-
 def is_segment_in_interval(segment_start, segment_end, interval_start, interval_end):
     if interval_start <= segment_start and segment_end <= interval_end:
         return True
@@ -425,13 +423,55 @@ def _count_event_scores(gt_event_scores, detection_scores):
     return results
 
 
-def event_metrics(segments):
+def _get_detailed_event_metrics(segments):
     gt_event_scores, det_event_scores = compute_event_scores(segments)
-    event_results = _count_event_scores(gt_event_scores, det_event_scores)
-    return gt_event_scores, det_event_scores, event_results
+    detailed_event_metrics = _count_event_scores(gt_event_scores, det_event_scores)
+    return gt_event_scores, det_event_scores, detailed_event_metrics
 
 
-def eval_segment_results(ground_truth_events, detected_events, evaluation_start=None, evaluation_end=None):
+def _get_standard_event_metrics(ground_truth_events, detected_events, gt_event_scores, detected_event_scores):
+    # Compute recall:
+    tp_gt = 0
+    tp_gt_w = 0
+    fn_gt = 0
+    fn_gt_w = 0
+    for i in range(len(ground_truth_events)):
+        if gt_event_scores[i] == 'D':
+            fn_gt += 1
+            fn_gt_w += ground_truth_events[i][1] - ground_truth_events[i][0]
+        else:
+            tp_gt += 1
+            tp_gt_w += ground_truth_events[i][1] - ground_truth_events[i][0]
+
+    recall = tp_gt / (tp_gt + fn_gt)
+    recall_w = tp_gt_w / (tp_gt_w + fn_gt_w)
+
+    # Compute precision:
+    tp_det = 0
+    tp_det_w = 0
+    fp_det = 0
+    fp_det_w = 0
+    for i in range(len(detected_events)):
+        if detected_event_scores[i] == "I'":
+            fp_det += 1
+            fp_det_w += detected_events[i][1] - detected_events[i][0]
+        else:
+            tp_det += 1
+            tp_det_w += detected_events[i][1] - detected_events[i][0]
+
+    precision =  tp_det / (tp_det + fp_det)
+    precision_w =  tp_det_w / (tp_det_w + fp_det_w)
+
+    standard_metrics = {
+        "precision": precision,
+        "recall": recall,
+        "precision (weighted)": precision_w,
+        "recall (weighted)": recall_w
+    }
+    return standard_metrics
+
+
+def eval_segments(ground_truth_events, detected_events, evaluation_start=None, evaluation_end=None):
     """
     Segment-based evaluation (frame - length based)
 
@@ -470,9 +510,37 @@ def eval_segment_results(ground_truth_events, detected_events, evaluation_start=
 
 
 def eval_events(ground_truth_events, detected_events, evaluation_start=None, evaluation_end=None):
+    """
+    Event-based evaluation
+
+    Assigns scores to each ground truth and detection event and calculates statistics
+
+    Args
+    ----
+        ground_truth_events: list of tuples (start, end) or lists [start, end]
+            numeric values (e.g. frame number or posix timestamp) for ground truth events' start and end times
+        detected_events: list of tuples (start, end) or lists [start, end]
+            numeric values (e.g. frame number or posix timestamp) for detected events' start and end times
+        evaluation_start: numeric value or None
+            This should be the first segment's start value. None indicates that start of the first event should be used.
+        evaluation_end: numeric value or None
+            This should be the first segment's start value. None indicates that start of the first event should be used.
+
+    Returns
+    -------
+        gt_scores: list
+            score label for each ground truth event
+        detection_scores: list
+            score label for each detected event
+        detailed_score_statistics: dictionary
+            containing total number of events for each score category
+        standard_score_statistics: dictionary
+            precision and recall values (normal and weighted with event length) based on standard event scores (TP, FP, TN, FN)
+    """
     segments_with_category = get_segments_with_standard_error_categories(ground_truth_events, detected_events, evaluation_start, evaluation_end)
     segments_with_detailed_categories = compute_detailed_segment_scores(segments_with_category)
 
-    gt_scores, detection_scores, score_statistics = event_metrics(segments_with_detailed_categories)
+    gt_scores, detection_scores, detailed_score_statistics = _get_detailed_event_metrics(segments_with_detailed_categories)
+    standard_score_statistics = _get_standard_event_metrics(ground_truth_events, detected_events, gt_scores, detection_scores)
 
-    return gt_scores, detection_scores, score_statistics
+    return gt_scores, detection_scores, detailed_score_statistics, standard_score_statistics

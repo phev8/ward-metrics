@@ -5,6 +5,10 @@ Core-methods
 
 Segmentation and segment-based metrics
 --------------------------------------
-Similar (or equal) to frame by frame evaluations using the detailed error scores.
+Similar (or equal) to frame by frame evaluations but using the detailed error scores additionally.
 
-.. autofunction:: eval_segment_results
+.. autofunction:: eval_segments
+
+Event-based metrics
+--------------------------------------
+.. autofunction:: eval_events
