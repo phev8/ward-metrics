@@ -1,6 +1,7 @@
 import wardmetrics
 from wardmetrics.core_methods import eval_events
 from wardmetrics.visualisations import *
+from wardmetrics.utils import *
 
 ground_truth_test = [
     (40, 60),
@@ -42,7 +43,10 @@ print("Using version",  wardmetrics.__version__)
 
 gt_event_scores, det_event_scores, detailed_scores, standard_scores = eval_events(ground_truth_test, detection_test)
 
-print(standard_scores)
+print_standard_event_metrics(standard_scores)
+print(standard_event_metrics_to_list(standard_scores))
+print(standard_event_metrics_to_string(standard_scores))
+exit()
 
 plot_events_with_event_scores(gt_event_scores, det_event_scores, ground_truth_test, detection_test, show=False)
 

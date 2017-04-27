@@ -10,9 +10,10 @@ Example 1: Segment detection and scoring
 
 Example 2: Event-based evaluation
 ---------------------------------
+.. literalinclude:: ../../examples/example_2.py
+   :language: python
 
 Example 3: Customizing plots
 ----------------------------
-
-Example 4: Using utils to save results
---------------------------------------
+.. literalinclude:: ../../examples/example_3.py
+   :language: python
