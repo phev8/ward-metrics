@@ -11,6 +11,7 @@ Welcome to ward-metrics' documentation!
    :caption: Contents:
 
    intro
+   explanations
    tutorial
    core-methods
    visualisations
