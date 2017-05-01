@@ -9,9 +9,10 @@ def print_standard_event_metrics(standard_event_results):
     Print standard precision and recall values
 
     Examples:
-        >>> Standard event results:
-        >>>\tprecision:\t0.8888888\tWeighted by length:	0.9186991
-        >>>\trecall:\t\t0.3333333\tWeighted by length:	0.2230576
+        >>> print_standard_event_metrics(test_r)
+        Standard event results:
+            precision:\t0.8888888\tWeighted by length:	0.9186991
+            recall:\t0.3333333\tWeighted by length:	0.2230576
     """
     print("Standard event results:")
     print("\tprecision:\t" + str(standard_event_results["precision"]) + "\tWeighted by length:\t" + str(standard_event_results["precision (weighted)"]))
@@ -34,7 +35,7 @@ def standard_event_metrics_to_list(standard_event_results):
         standard_event_results["recall (weighted)"]]
 
 
-def standard_event_metrics_to_string(standard_event_results, separator=", ", prefix="[", append="]"):
+def standard_event_metrics_to_string(standard_event_results, separator=", ", prefix="[", suffix="]"):
     """ Converting standard event metric results to a string
 
     Argument:
@@ -43,18 +44,21 @@ def standard_event_metrics_to_string(standard_event_results, separator=", ", pre
     Keyword Arguments:
         separator (str): characters between each item
         prefix (str): string that will be added before the line
-        append (str): string that will be added to the end of the line
+        suffix (str): string that will be added to the end of the line
 
     Returns:
         str: Item order: 1. Precision, 2. Recall 3. Length weighted precision, 4. Length weighted recall
 
     Examples:
-        >>> [0.88888, 0.33333, 0.918, 0.22305]
-        >>> /0.88888\t0.33333\t0.918\t0.22305/
-        >>> 0.88888, 0.33333, 0.918, 0.22305\\n
+        >>> standard_event_metrics_to_string(test_r)
+        [0.88888, 0.33333, 0.918, 0.22305]
+        >>> standard_event_metrics_to_string(test_r, separator="\t", prefix="/", suffix="/")
+        /0.88888\t0.33333\t0.918\t0.22305/
+        >>> standard_event_metrics_to_string(test_r, prefix="", suffix="\\n")
+        0.88888, 0.33333, 0.918, 0.22305\\n
 
     """
-    return prefix + separator.join(map(str, standard_event_metrics_to_list(standard_event_results))) + append
+    return prefix + separator.join(map(str, standard_event_metrics_to_list(standard_event_results))) + suffix
 
 
 def print_detailed_event_metrics(detailed_event_results):
@@ -62,19 +66,20 @@ def print_detailed_event_metrics(detailed_event_results):
     Print totals for each event category
 
     Example:
-        >>> Detailed event results:
-        >>>     Actual events:
-        >>>         deletions:\t\t1	12.50% of actual events
-        >>>         merged:\t\t3	37.50% of actual events
-        >>>         fragmented:\t\t1	12.50% of actual events
-        >>>         frag. and merged:\t1	12.50% of actual events
-        >>>         correct:\t\t2	25.00% of actual events
-        >>>    Detected events:
-        >>>         insertions:\t\t1	11.11% of detected events
-        >>>         merging:\t\t1	11.11% of detected events
-        >>>         fragmenting:\t4	44.44% of detected events
-        >>>         frag. and merging:\t1	11.11% of detected events
-        >>>         correct:\t\t2	22.22% of detected events
+        >>> print_detailed_event_metrics(test_r)
+        Detailed event results:
+             Actual events:
+                 deletions:\t\t1	12.50% of actual events
+                 merged:\t\t3	37.50% of actual events
+                 fragmented:\t\t1	12.50% of actual events
+                 frag. and merged:\t1	12.50% of actual events
+                 correct:\t\t2	25.00% of actual events
+            Detected events:
+                 insertions:\t\t1	11.11% of detected events
+                 merging:\t\t1	11.11% of detected events
+                 fragmenting:\t\t4	44.44% of detected events
+                 frag. and merging:\t1	11.11% of detected events
+                 correct:\t\t2	22.22% of detected events
 
     """
     print("Detailed event results:")
@@ -118,7 +123,7 @@ def detailed_event_metrics_to_list(detailed_event_results):
         ]
 
 
-def detailed_event_metrics_to_string(detailed_event_results, separator=", ", prefix="[", append="]"):
+def detailed_event_metrics_to_string(detailed_event_results, separator=", ", prefix="[", suffix="]"):
     """ Converting detailed event metric results to a string
 
     Argument:
@@ -127,15 +132,17 @@ def detailed_event_metrics_to_string(detailed_event_results, separator=", ", pre
     Keyword Arguments:
         separator (str): characters between each item
         prefix (str): string that will be added before the line
-        append (str): string that will be added to the end of the line
+        suffix (str): string that will be added to the end of the line
 
     Returns:
         str: Item order: 0. correct, 1. deletions 2. merged, 3. fragmented, 4. fragmented and merged, 5. fragmenting, 6. merging, 7. fragmenting and merging, 8. insertions, 9. total of actual events, 10. total of detected events
 
     Examples:
-        >>> [2, 1, 3, 1, 1, 4, 1, 1, 1, 8, 9]
-        >>> (2;1;3;1;1;4;1;1;1;8;9)\\n
+        >>> detailed_event_metrics_to_string(test_r)
+        [2, 1, 3, 1, 1, 4, 1, 1, 1, 8, 9]
+        >>> detailed_event_metrics_to_string(test_r, separator=";", prefix="(", suffix=")\\n")
+        (2;1;3;1;1;4;1;1;1;8;9)\\n
 
     """
-    return prefix + separator.join(map(str, detailed_event_metrics_to_list(detailed_event_results))) + append
+    return prefix + separator.join(map(str, detailed_event_metrics_to_list(detailed_event_results))) + suffix
 
