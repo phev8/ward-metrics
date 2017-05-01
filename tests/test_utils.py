@@ -33,7 +33,7 @@ class TestUtils(unittest.TestCase):
         result_3 = "0.1, 0.2, 0.3, 0.4"
         self.assertEqual(standard_event_metrics_to_string(standard_metrics), result_1)
         self.assertEqual(standard_event_metrics_to_string(standard_metrics, separator="\t"), result_2)
-        self.assertEqual(standard_event_metrics_to_string(standard_metrics, prefix="", append=""), result_3)
+        self.assertEqual(standard_event_metrics_to_string(standard_metrics, prefix="", suffix=""), result_3)
 
     def test_detailed_event_metrics_to_list(self):
         values = [1, 2, 3, 4, 5, 6,  7, 8, 9, 10, 11]
@@ -66,7 +66,7 @@ class TestUtils(unittest.TestCase):
         result_3 = "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11"
         self.assertEqual(detailed_event_metrics_to_string(metrics), result_1)
         self.assertEqual(detailed_event_metrics_to_string(metrics, separator="\t"), result_2)
-        self.assertEqual(detailed_event_metrics_to_string(metrics, prefix="", append=""), result_3)
+        self.assertEqual(detailed_event_metrics_to_string(metrics, prefix="", suffix=""), result_3)
 
 
 if __name__ == '__main__':
