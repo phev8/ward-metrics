@@ -38,11 +38,11 @@ print_detailed_event_metrics(detailed_scores)
 # Access results in other formats:
 print(standard_event_metrics_to_list(standard_scores)) # standard scores as basic python list, order: p, r, p_w, r_w
 print(standard_event_metrics_to_string(standard_scores)) # standard scores as string line, order: p, r, p_w, r_w)
-print(standard_event_metrics_to_string(standard_scores, separator=";", prefix="(", append=")\n")) # standard scores as string line, order: p, r, p_w, r_w
+print(standard_event_metrics_to_string(standard_scores, separator=";", prefix="(", suffix=")\n")) # standard scores as string line, order: p, r, p_w, r_w
 
 print(detailed_event_metrics_to_list(detailed_scores)) # detailed scores as basic python list
 print(detailed_event_metrics_to_string(detailed_scores)) # detailed scores as string line
-print(detailed_event_metrics_to_string(detailed_scores, separator=";", prefix="(", append=")\n")) # standard scores as string line
+print(detailed_event_metrics_to_string(detailed_scores, separator=";", prefix="(", suffix=")\n")) # standard scores as string line
 
 
 # Show results:

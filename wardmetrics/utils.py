@@ -146,3 +146,166 @@ def detailed_event_metrics_to_string(detailed_event_results, separator=", ", pre
     """
     return prefix + separator.join(map(str, detailed_event_metrics_to_list(detailed_event_results))) + suffix
 
+
+def print_detailed_segment_results(detailed_segment_results):
+    """
+    Print segment length for each detailed segment category. Can be used with normed values as well.
+
+    Arguments:
+        detailed_segment_results (dictionary): as provided by the 3rd or 4th item in the results of eval_segments function
+
+    Example:
+        >>> print_detailed_segment_results(test_r)
+        Detailed segment results (length or frame count):
+            true positive segments:\t\t40
+            true negative segments:\t\t91
+            insertion segments:\t\t\t10
+            deletion segments:\t\t\t10
+            fragmenting segments:\t\t7
+            merge segments:\t\t\t15
+            start overfill segments:\t\t10
+            end overfill segments:\t\t28
+            start underfill segments:\t\t13
+            end underfill segments:\t\t15
+    """
+    print("Detailed segment results (length or frame count):")
+    print("\ttrue positive segments:\t\t" + str(detailed_segment_results["TP"]))
+    print("\ttrue negative segments:\t\t" + str(detailed_segment_results["TN"]))
+    print("\tinsertion segments:\t\t\t" + str(detailed_segment_results["I"]))
+    print("\tdeletion segments:\t\t\t" + str(detailed_segment_results["D"]))
+    print("\tfragmenting segments:\t\t" + str(detailed_segment_results["F"]))
+    print("\tmerge segments:\t\t\t\t" + str(detailed_segment_results["M"]))
+    print("\tstart overfill segments:\t" + str(detailed_segment_results["Os"]))
+    print("\tend overfill segments:\t\t" + str(detailed_segment_results["Oe"]))
+    print("\tstart underfill segments:\t" + str(detailed_segment_results["Us"]))
+    print("\tend underfill segments:\t\t" + str(detailed_segment_results["Ue"]))
+
+
+def detailed_segment_results_to_list(detailed_segment_results):
+    """ Converting detailed segment results to a list (position of each item is fixed). Can be used with normed values as well.
+
+    Argument:
+        detailed_segment_results (dictionary): as provided by the 3rd or 4th item in the results of eval_segments function
+
+    Returns:
+        list: Item order: 0. true posives, 1. true negatives, 2. insertions, 3. deletions, 4. fragmenting, 5. merged, 6. start overfill, 7. end overfill, 8. start underfill, 9. end underfill
+    """
+    return [
+        detailed_segment_results["TP"],
+        detailed_segment_results["TN"],
+        detailed_segment_results["I"],
+        detailed_segment_results["D"],
+        detailed_segment_results["F"],
+        detailed_segment_results["M"],
+        detailed_segment_results["Os"],
+        detailed_segment_results["Oe"],
+        detailed_segment_results["Us"],
+        detailed_segment_results["Ue"]
+        ]
+
+
+def detailed_segment_results_to_string(detailed_segment_results, separator=", ", prefix="[", suffix="]"):
+    """ Converting detailed segment results to a string. Can be used with normed values as well.
+
+    Argument:
+        detailed_segment_results (dictionary): as provided by the 3rd or 4th item in the results of eval_segments function
+
+    Keyword Arguments:
+        separator (str): characters between each item
+        prefix (str): string that will be added before the line
+        suffix (str): string that will be added to the end of the line
+
+    Returns:
+        str: Item order: 0. true posives, 1. true negatives, 2. insertions, 3. deletions, 4. fragmenting, 5. merged, 6. start overfill, 7. end overfill, 8. start underfill, 9. end underfill
+
+    Examples:
+        >>> detailed_segment_results_to_string(test_r)
+        [2, 1, 3, 1, 1, 4, 1, 1, 1, 8]
+        >>> detailed_segment_results_to_string(test_r, separator=";", prefix="(", suffix=")\\n")
+        (2;1;3;1;1;4;1;1;1;8)\\n
+
+    """
+    return prefix + separator.join(map(str, detailed_segment_results_to_list(detailed_segment_results))) + suffix
+
+
+# TODO
+def print_twoset_segment_metrics(twoset_metrics_results):
+    """
+    Print 2SET metric results
+
+    Argument:
+        twoset_metrics_results (dictionary): as provided by the 1st item in the results of eval_events function
+
+    Example:
+        >>> print_twoset_segment_metrics(test_r)
+        2SET metrics:
+            true positive rate:\t\t0.471
+            deletion rate:\t\t0.118
+            fragmenting rate:\t\t0.082
+            start underfill rate:\t0.153
+            end underfill rate:\t\t0.176
+            1 - false positive rate:\t0.591
+            insertion rate:\t\t0.065
+            merge rate:\t\t\t0.097
+            start overfill rate:\t0.065
+            end overfill rate:\t\t0.182
+    """
+    print("2SET metrics:")
+    print("\ttrue positive rate:\t\t\t" + "{0:.3f}".format(twoset_metrics_results["tpr"]))
+    print("\tdeletion rate:\t\t\t\t" + "{0:.3f}".format(twoset_metrics_results["dr"]))
+    print("\tfragmenting rate:\t\t\t" + "{0:.3f}".format(twoset_metrics_results["fr"]))
+    print("\tstart underfill rate:\t\t" + "{0:.3f}".format(twoset_metrics_results["us"]))
+    print("\tend underfill rate:\t\t\t" + "{0:.3f}".format(twoset_metrics_results["ue"]))
+
+    print("\n\t1 - false positive rate:\t" + "{0:.3f}".format(1 - twoset_metrics_results["fpr"]))
+    print("\tinsertion rate:\t\t\t\t" + "{0:.3f}".format(twoset_metrics_results["ir"]))
+    print("\tmerge rate:\t\t\t\t\t" + "{0:.3f}".format(twoset_metrics_results["mr"]))
+    print("\tstart overfill rate:\t\t" + "{0:.3f}".format(twoset_metrics_results["os"]))
+    print("\tend overfill rate:\t\t\t" + "{0:.3f}".format(twoset_metrics_results["oe"]))
+
+
+def twoset_segment_metrics_to_list(twoset_metrics_results):
+    """ Converting detailed event metric results to a list (position of each item is fixed)
+
+    Argument:
+        twoset_metrics_results (dictionary): as provided by the 1st item in the results of eval_events function
+
+    Returns:
+        list: Item order: 0. true positive rate, 1. deletion rate 2. fragmenting rate, 3. start underfill rate, 4. end underfill rate, 5. 1 - false positive rate, 6. insertion rate, 7. merge rate, 8. start overfill rate, 9. end overfill rate
+    """
+    return [
+        twoset_metrics_results["tpr"],
+        twoset_metrics_results["dr"],
+        twoset_metrics_results["fr"],
+        twoset_metrics_results["us"],
+        twoset_metrics_results["ue"],
+        1-twoset_metrics_results["fpr"],
+        twoset_metrics_results["ir"],
+        twoset_metrics_results["mr"],
+        twoset_metrics_results["os"],
+        twoset_metrics_results["oe"]
+        ]
+
+
+def twoset_segment_metrics_to_string(twoset_metrics_results, separator=", ", prefix="[", suffix="]"):
+    """ Converting detailed event metric results to a string
+
+    Argument:
+        twoset_metrics_results (dictionary): as provided by the 1st item in the results of eval_events function
+
+    Keyword Arguments:
+        separator (str): characters between each item
+        prefix (str): string that will be added before the line
+        suffix (str): string that will be added to the end of the line
+
+    Returns:
+        str: Item order: 0. true positive rate, 1. deletion rate 2. fragmenting rate, 3. start underfill rate, 4. end underfill rate, 5. 1 - false positive rate, 6. insertion rate, 7. merge rate, 8. start overfill rate, 9. end overfill rate
+
+    Examples:
+        >>> twoset_segment_metrics_to_string(test_r)
+        [0.47058823529411764, 0.11764705882352941, 0.08235294117647059, 0.15294117647058825, 0.17647058823529413, 0.5909090909090909, 0.06493506493506493, 0.09740259740259741, 0.06493506493506493, 0.18181818181818182]
+        >>> twoset_segment_metrics_to_string(test_r, separator=";", prefix="(", suffix=")\\n")
+        (0.47058823529411764;0.11764705882352941;0.08235294117647059;0.15294117647058825;0.17647058823529413;0.5909090909090909;0.06493506493506493;0.09740259740259741;0.06493506493506493;0.18181818181818182)\\n
+
+    """
+    return prefix + separator.join(map(str, twoset_segment_metrics_to_list(twoset_metrics_results))) + suffix
