@@ -25,3 +25,7 @@ Detailed segment-based results
 .. autofunction:: print_twoset_segment_metrics
 .. autofunction:: twoset_segment_metrics_to_list
 .. autofunction:: twoset_segment_metrics_to_string
+
+Convert frame-by-frame multiclass results to events
+---------------------------------------------------
+.. autofunction:: frame_results_to_events

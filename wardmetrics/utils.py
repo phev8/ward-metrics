@@ -1,7 +1,54 @@
 # TODO: implement event creation out of frame based results
 # TODO: implement wrappers for pandas row based events
-# TODO: implement pretty output printing
 # TODO: wrapper for multiclass case
+
+
+def frame_results_to_events(frame_results, frame_times=None):
+    """
+    Converting frame-by-frame results into a list of events for each label. If the classifier predicts the same label in a sequence it is considers as an event. (Filtering too short events, or merge close-by events is not included here.)
+
+    Arguments:
+        frame_results (list or numpy array): list of frame class labels in an temporal order (sequential). It can contain numeric or string values e.g. ``[1, 1, 0, ...]`` or ``['class_1', 'class_1', 'class_0', ...]``
+        frame_times (list or numpy array): list of timestamps (preferably as numeric values e.g. posix time) for each frame.
+
+    Returns:
+        dictionary: list of events (tuple of start and end times/indexes) for each unique label found in the frame_results. Event start value is the first occurence of the label, event end is the time or index of the next frame after the event (also the start of the next event).
+    """
+    if len(frame_results) < 2:
+        raise ValueError("frame_results has to contain at least 2 items.")
+
+    if frame_times is not None and len(frame_results) != len(frame_times):
+        raise ValueError("Length of frame_results and frame_times has to be equal.")
+
+    unique_labels = set(frame_results)
+
+    # Init event lists for each label:
+    results = {}
+    for l in unique_labels:
+        results[str(l)] = []
+
+    event_label = frame_results[0]
+    event_start_index = 0
+
+    for index in range(1, len(frame_results)):
+        if frame_results[index] != event_label:
+            # close event:
+            if frame_times is None:
+                results[str(event_label)].append((event_start_index, index))
+            else:
+                results[str(event_label)].append((frame_times[event_start_index], frame_times[index]))
+
+            # start new event:
+            event_label = frame_results[index]
+            event_start_index = index
+
+    # close last event:
+    if frame_times is None:
+        results[str(event_label)].append((event_start_index, index+1))
+    else:
+        results[str(event_label)].append((frame_times[event_start_index], frame_times[-1] + float(frame_times[-1] - frame_times[0])/(len(frame_times)-1) ))
+
+    return results
 
 
 def print_standard_event_metrics(standard_event_results):
@@ -228,7 +275,6 @@ def detailed_segment_results_to_string(detailed_segment_results, separator=", ",
     return prefix + separator.join(map(str, detailed_segment_results_to_list(detailed_segment_results))) + suffix
 
 
-# TODO
 def print_twoset_segment_metrics(twoset_metrics_results):
     """
     Print 2SET metric results

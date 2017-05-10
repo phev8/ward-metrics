@@ -119,5 +119,34 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(twoset_segment_metrics_to_string(twoset_metrics, separator="\t"), result_2)
         self.assertEqual(twoset_segment_metrics_to_string(twoset_metrics, prefix="", suffix=""), result_3)
 
+    def test_frame_results_to_events(self):
+        frame_results_numeric = [1, 0, 0, 0, 0, 2, 2, 2, 1, 2, 3, 2, 2, 2, 1, 1, 1, 0, 0, 0, 6]
+        frame_results_str = ["1", "0", "0", "0", "0", "2", "2", "2", "1", "2", "3", "2", "2", "2", "1", "1", "1", "0", "0", "0", "6"]
+        times = [t*0.1 for t in range(len(frame_results_numeric))]
+
+        result_1 = {
+            "0": [(1, 5), (17, 20)],
+            "1": [(0, 1), (8, 9), (14, 17)],
+            "2": [(5, 8), (9, 10), (11, 14)],
+            "3": [(10, 11)],
+            "6": [(20, 21)]
+        }
+        result_2 = {
+            "0": [(times[1], times[5]), (times[17], times[20])],
+            "1": [(times[0], times[1]), (times[8], times[9]), (times[14], times[17])],
+            "2": [(times[5], times[8]), (times[9], times[10]), (times[11], times[14])],
+            "3": [(times[10], times[11])],
+            "6": [(times[20], times[20] + 0.1)]
+        }
+
+        self.assertEqual(frame_results_to_events(frame_results_numeric), result_1)
+        self.assertEqual(frame_results_to_events(frame_results_str), result_1)
+        self.assertEqual(frame_results_to_events(frame_results_numeric, times), result_2)
+        self.assertEqual(frame_results_to_events(frame_results_str, times), result_2)
+
+        self.assertRaises(ValueError, frame_results_to_events, frame_results_numeric, [0.1, 0.2])
+        self.assertRaises(ValueError, frame_results_to_events, [1])
+
+
 if __name__ == '__main__':
     unittest.main()
