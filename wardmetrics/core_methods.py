@@ -67,6 +67,7 @@ def get_segments_with_standard_error_categories(ground_truth_events, detected_ev
                     last_segment = (last_segment[1], evaluation_end, gt_i, det_i, category)
                     segments.append(last_segment)
                 break
+            gt_index = len(ground_truth_events) - 1
         elif det_index >= len(detected_events):
             det_index = len(detected_events) - 1
 
