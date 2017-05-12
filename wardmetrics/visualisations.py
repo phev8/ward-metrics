@@ -16,7 +16,9 @@ def plot_events_with_segment_scores(segment_results, ground_truth_events, detect
 
     # TODO: convert times to datetime if flag is set
 
-    # TODO: write y axis labels for ground truth and detections
+    # write y axis labels for ground truth and detections
+    plt.yticks([0.2, 0.5, 0.8], ["detections", "segment score", "actual events"])
+    plt.ylim([0, 1])
 
     for d in detected_events:
         plt.axvspan(d[0], d[1], 0, 0.5)
