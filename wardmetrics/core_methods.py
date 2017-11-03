@@ -48,7 +48,6 @@ def get_segments_with_standard_error_categories(ground_truth_events, detected_ev
     det_index = 0
     last_segment = None
 
-    # TODO: handle if no gt or no det
     # TODO: handle events with zero length
 
     while True:
@@ -106,7 +105,7 @@ def get_segments_with_standard_error_categories(ground_truth_events, detected_ev
             # Create first segment:
             if evaluation_start is None:
                 seg_start = min(gt_start, d_start)
-                seg_end = min(gt_end, d_end)
+                seg_end = min(max(gt_start, d_start), min(gt_end, d_end))
             else:
                 seg_start = evaluation_start
                 seg_end = min(gt_start, d_start)
@@ -500,6 +499,9 @@ def eval_segments(ground_truth_events, detected_events, evaluation_start=None, e
         normed_segment_counts: dictionary
             same as before but normed
     """
+    if len(ground_truth_events) <= 0 or len(detected_events) <= 0:
+        raise AttributeError("Insufficient data. List of ground truth or detected events is empty - calculation not possible.")
+
     segments_with_category = get_segments_with_standard_error_categories(ground_truth_events, detected_events,
                                                                          evaluation_start, evaluation_end)
     segments_with_detailed_categories = compute_detailed_segment_scores(segments_with_category)
@@ -538,6 +540,9 @@ def eval_events(ground_truth_events, detected_events, evaluation_start=None, eva
         standard_score_statistics: dictionary
             precision and recall values (normal and weighted with event length) based on standard event scores (TP, FP, TN, FN)
     """
+    if len(ground_truth_events) <= 0 or len(detected_events) <= 0:
+        raise AttributeError("Insufficient data. List of ground truth or detected events is empty - calculation not possible.")
+
     segments_with_category = get_segments_with_standard_error_categories(ground_truth_events, detected_events, evaluation_start, evaluation_end)
     segments_with_detailed_categories = compute_detailed_segment_scores(segments_with_category)
 
