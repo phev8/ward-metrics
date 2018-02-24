@@ -144,6 +144,15 @@ def get_segments_with_standard_error_categories(ground_truth_events, detected_ev
         if seg_end >= gt_end:
             gt_index += 1
 
+    index_to_remove = []
+    for index, segment in enumerate(segments):
+        if segment[1] - segment[0] <= 0:
+            index_to_remove.append(index)
+
+    index_to_remove.reverse()
+    for index in index_to_remove:
+        del segments[index]
+
     return segments
 
 
