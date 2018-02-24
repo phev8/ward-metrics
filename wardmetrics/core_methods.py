@@ -1,3 +1,19 @@
+def merge_events_if_necessary(events):
+    index_to_remove = []
+
+    for index in range(1, len(events)):
+        if events[index - 1][1] == events[index][0]:
+            events[index - 1] = (events[index-1][0], events[index][1])
+            index_to_remove.append(index)
+
+    index_to_remove.reverse()
+
+    for index in index_to_remove:
+        del events[index]
+
+    return events
+
+
 def is_segment_in_interval(segment_start, segment_end, interval_start, interval_end):
     if interval_start <= segment_start and segment_end <= interval_end:
         return True
@@ -502,6 +518,9 @@ def eval_segments(ground_truth_events, detected_events, evaluation_start=None, e
     if len(ground_truth_events) <= 0 or len(detected_events) <= 0:
         raise AttributeError("Insufficient data. List of ground truth or detected events is empty - calculation not possible.")
 
+    ground_truth_events = merge_events_if_necessary(ground_truth_events)
+    detected_events = merge_events_if_necessary(detected_events)
+
     segments_with_category = get_segments_with_standard_error_categories(ground_truth_events, detected_events,
                                                                          evaluation_start, evaluation_end)
     segments_with_detailed_categories = compute_detailed_segment_scores(segments_with_category)
@@ -542,6 +561,9 @@ def eval_events(ground_truth_events, detected_events, evaluation_start=None, eva
     """
     if len(ground_truth_events) <= 0 or len(detected_events) <= 0:
         raise AttributeError("Insufficient data. List of ground truth or detected events is empty - calculation not possible.")
+
+    ground_truth_events = merge_events_if_necessary(ground_truth_events)
+    detected_events = merge_events_if_necessary(detected_events)
 
     segments_with_category = get_segments_with_standard_error_categories(ground_truth_events, detected_events, evaluation_start, evaluation_end)
     segments_with_detailed_categories = compute_detailed_segment_scores(segments_with_category)

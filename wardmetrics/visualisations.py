@@ -138,7 +138,7 @@ def plot_event_analysis_diagram(event_results, **kwargs):
     Keyword Arguments:
         fontsize (int): Size of the text inside the bar plot (Reduce the value if some event types are too short)
         use_percentage (bool): whether percentage values or to show actual event counts on the chart (default: False)
-        use_percentage (bool): whether to call plt.show (blocking) or plt.draw() for later displaying (default: True)
+        show (bool): whether to call plt.show (blocking) or plt.draw() for later displaying (default: True)
         color_deletion: any matplotlib color for deletion events
         color_fragmented: any matplotlib color for fragmented ground truth events
         color_fragmented_merged: any matplotlib color for merged and fragmented ground truth events
